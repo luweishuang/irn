@@ -14,17 +14,14 @@ from misc import torchutils, indexing
 
 cudnn.enabled = True
 
-def _work(process_id, model, dataset, args):
 
+def _work(process_id, model, dataset, args):
     n_gpus = torch.cuda.device_count()
     databin = dataset[process_id]
     data_loader = DataLoader(databin,
                              shuffle=False, num_workers=args.num_workers // n_gpus, pin_memory=False)
-
     with torch.no_grad(), cuda.device(process_id):
-
         model.cuda()
-
         for iter, pack in enumerate(data_loader):
             img_name = voc12.dataloader.decode_int_filename(pack['name'][0])
             orig_img_size = np.asarray(pack['size'])
@@ -49,7 +46,6 @@ def _work(process_id, model, dataset, args):
             rw_pred = keys[rw_pred]
 
             imageio.imsave(os.path.join(args.sem_seg_out_dir, img_name + '.png'), rw_pred.astype(np.uint8))
-
             if process_id == n_gpus - 1 and iter % (len(databin) // 20) == 0:
                 print("%d " % ((5*iter+1)//(len(databin) // 20)), end='')
 
@@ -60,7 +56,6 @@ def run(args):
     model.eval()
 
     n_gpus = torch.cuda.device_count()
-
     dataset = voc12.dataloader.VOC12ClassificationDatasetMSF(args.infer_list,
                                                              voc12_root=args.voc12_root,
                                                              scales=(1.0,))
