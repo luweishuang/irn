@@ -1,3 +1,5 @@
+.idea/
+sess/
 voc12/data/
 misc/__pycache__/
 net/__pycache__/
