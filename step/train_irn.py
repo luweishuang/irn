@@ -7,12 +7,10 @@ import voc12.dataloader
 from misc import pyutils, torchutils, indexing
 import importlib
 
+
 def run(args):
-
     path_index = indexing.PathIndex(radius=10, default_size=(args.irn_crop_size // 4, args.irn_crop_size // 4))
-
-    model = getattr(importlib.import_module(args.irn_network), 'AffinityDisplacementLoss')(
-        path_index)
+    model = getattr(importlib.import_module(args.irn_network), 'AffinityDisplacementLoss')(path_index)
 
     train_dataset = voc12.dataloader.VOC12AffinityDataset(args.train_list,
                                                           label_dir=args.ir_label_out_dir,
@@ -39,15 +37,10 @@ def run(args):
     model.train()
 
     avg_meter = pyutils.AverageMeter()
-
     timer = pyutils.Timer()
-
     for ep in range(args.irn_num_epoches):
-
         print('Epoch %d/%d' % (ep+1, args.irn_num_epoches))
-
         for iter, pack in enumerate(train_data_loader):
-
             img = pack['img'].cuda(non_blocking=True)
             bg_pos_label = pack['aff_bg_pos_label'].cuda(non_blocking=True)
             fg_pos_label = pack['aff_fg_pos_label'].cuda(non_blocking=True)
@@ -62,16 +55,13 @@ def run(args):
 
             dp_fg_loss = torch.sum(dp_fg_loss * torch.unsqueeze(fg_pos_label, 1)) / (2 * torch.sum(fg_pos_label) + 1e-5)
             dp_bg_loss = torch.sum(dp_bg_loss * torch.unsqueeze(bg_pos_label, 1)) / (2 * torch.sum(bg_pos_label) + 1e-5)
-
             avg_meter.add({'loss1': pos_aff_loss.item(), 'loss2': neg_aff_loss.item(),
                            'loss3': dp_fg_loss.item(), 'loss4': dp_bg_loss.item()})
-
             total_loss = (pos_aff_loss + neg_aff_loss) / 2 + (dp_fg_loss + dp_bg_loss) / 2
 
             optimizer.zero_grad()
             total_loss.backward()
             optimizer.step()
-
             if (optimizer.global_step - 1) % 50 == 0:
                 timer.update_progress(optimizer.global_step / max_step)
 
@@ -99,11 +89,8 @@ def run(args):
     with torch.no_grad():
         for iter, pack in enumerate(infer_data_loader):
             img = pack['img'].cuda(non_blocking=True)
-
             aff, dp = model(img, False)
-
             dp_mean_list.append(torch.mean(dp, dim=(0, 2, 3)).cpu())
-
         model.module.mean_shift.running_mean = torch.mean(torch.stack(dp_mean_list), dim=0)
     print('done.')
 
