@@ -9,7 +9,7 @@ if __name__ == '__main__':
 
     # Environment
     parser.add_argument("--num_workers", default=os.cpu_count()//2, type=int)
-    parser.add_argument("--voc12_root", required=True, type=str,
+    parser.add_argument("--voc12_root", default='voc12/data/VOC12/train', type=str,
                         help="Path to VOC 2012 Devkit, must contain ./JPEGImages as subdirectory.")
 
     # Dataset
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     # Class Activation Map
     parser.add_argument("--cam_network", default="net.resnet50_cam", type=str)
     parser.add_argument("--cam_crop_size", default=512, type=int)
-    parser.add_argument("--cam_batch_size", default=16, type=int)
+    parser.add_argument("--cam_batch_size", default=64, type=int)
     parser.add_argument("--cam_num_epoches", default=5, type=int)
     parser.add_argument("--cam_learning_rate", default=0.1, type=float)
     parser.add_argument("--cam_weight_decay", default=1e-4, type=float)
