@@ -1,1 +1,7 @@
 voc12/data/
+misc/__pycache__/
+net/__pycache__/
+step/__pycache__/
+voc12/__pycache__/
+
+sample_train_eval.log
