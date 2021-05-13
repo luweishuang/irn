@@ -23,9 +23,11 @@ CAT_NAME_TO_NUM = dict(zip(CAT_LIST,range(len(CAT_LIST))))
 
 cls_labels_dict = np.load('voc12/cls_labels.npy', allow_pickle=True).item()
 
+
 def decode_int_filename(int_filename):
     s = str(int(int_filename))
     return s[:4] + '_' + s[4:]
+
 
 def load_image_label_from_xml(img_name, voc12_root):
     from xml.dom import minidom
@@ -39,26 +41,25 @@ def load_image_label_from_xml(img_name, voc12_root):
         if cat_name in CAT_LIST:
             cat_num = CAT_NAME_TO_NUM[cat_name]
             multi_cls_lab[cat_num] = 1.0
-
     return multi_cls_lab
 
-def load_image_label_list_from_xml(img_name_list, voc12_root):
 
+def load_image_label_list_from_xml(img_name_list, voc12_root):
     return [load_image_label_from_xml(img_name, voc12_root) for img_name in img_name_list]
 
-def load_image_label_list_from_npy(img_name_list):
 
+def load_image_label_list_from_npy(img_name_list):
     return np.array([cls_labels_dict[img_name] for img_name in img_name_list])
+
 
 def get_img_path(img_name, voc12_root):
     if not isinstance(img_name, str):
         img_name = decode_int_filename(img_name)
     return os.path.join(voc12_root, IMG_FOLDER_NAME, img_name + '.jpg')
 
+
 def load_img_name_list(dataset_path):
-
     img_name_list = np.loadtxt(dataset_path, dtype=np.int32)
-
     return img_name_list
 
 
@@ -74,11 +75,10 @@ class TorchvisionNormalize():
         proc_img[..., 0] = (imgarr[..., 0] / 255. - self.mean[0]) / self.std[0]
         proc_img[..., 1] = (imgarr[..., 1] / 255. - self.mean[1]) / self.std[1]
         proc_img[..., 2] = (imgarr[..., 2] / 255. - self.mean[2]) / self.std[2]
-
         return proc_img
 
-class GetAffinityLabelFromIndices():
 
+class GetAffinityLabelFromIndices():
     def __init__(self, indices_from, indices_to):
 
         self.indices_from = indices_from
@@ -107,7 +107,6 @@ class GetAffinityLabelFromIndices():
 
 
 class VOC12ImageDataset(Dataset):
-
     def __init__(self, img_name_list_path, voc12_root,
                  resize_long=None, rescale=None, img_normal=TorchvisionNormalize(), hor_flip=False,
                  crop_size=None, crop_method=None, to_torch=True):
@@ -155,8 +154,8 @@ class VOC12ImageDataset(Dataset):
 
         return {'name': name_str, 'img': img}
 
-class VOC12ClassificationDataset(VOC12ImageDataset):
 
+class VOC12ClassificationDataset(VOC12ImageDataset):
     def __init__(self, img_name_list_path, voc12_root,
                  resize_long=None, rescale=None, img_normal=TorchvisionNormalize(), hor_flip=False,
                  crop_size=None, crop_method=None):
@@ -167,10 +166,9 @@ class VOC12ClassificationDataset(VOC12ImageDataset):
 
     def __getitem__(self, idx):
         out = super().__getitem__(idx)
-
         out['label'] = torch.from_numpy(self.label_list[idx])
-
         return out
+
 
 class VOC12ClassificationDatasetMSF(VOC12ClassificationDataset):
 
@@ -203,6 +201,7 @@ class VOC12ClassificationDatasetMSF(VOC12ClassificationDataset):
         out = {"name": name_str, "img": ms_img_list, "size": (img.shape[0], img.shape[1]),
                "label": torch.from_numpy(self.label_list[idx])}
         return out
+
 
 class VOC12SegmentationDataset(Dataset):
 
@@ -249,8 +248,8 @@ class VOC12SegmentationDataset(Dataset):
             label = imutils.top_left_crop(label, self.crop_size, 255)
 
         img = imutils.HWC_to_CHW(img)
-
         return {'name': name, 'img': img, 'label': label}
+
 
 class VOC12AffinityDataset(VOC12SegmentationDataset):
     def __init__(self, img_name_list_path, label_dir, crop_size, voc12_root,
