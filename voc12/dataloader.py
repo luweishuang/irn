@@ -162,7 +162,7 @@ class VOC12ClassificationDataset(VOC12ImageDataset):
         super().__init__(img_name_list_path, voc12_root,
                  resize_long, rescale, img_normal, hor_flip,
                  crop_size, crop_method)
-        self.label_list = load_image_label_list_from_npy(self.img_name_list)
+        self.label_list = load_image_label_list_from_npy(self.img_name_list)   # !!没有cls文件
 
     def __getitem__(self, idx):
         out = super().__getitem__(idx)
@@ -171,7 +171,6 @@ class VOC12ClassificationDataset(VOC12ImageDataset):
 
 
 class VOC12ClassificationDatasetMSF(VOC12ClassificationDataset):
-
     def __init__(self, img_name_list_path, voc12_root,
                  img_normal=TorchvisionNormalize(),
                  scales=(1.0,)):
@@ -264,10 +263,7 @@ class VOC12AffinityDataset(VOC12SegmentationDataset):
 
     def __getitem__(self, idx):
         out = super().__getitem__(idx)
-
         reduced_label = imutils.pil_rescale(out['label'], 0.25, 0)
-
         out['aff_bg_pos_label'], out['aff_fg_pos_label'], out['aff_neg_label'] = self.extract_aff_lab_func(reduced_label)
-
         return out
 

@@ -53,7 +53,6 @@ class CAM(Net):
         super(CAM, self).__init__()
 
     def forward(self, x):
-
         x = self.stage1(x)
 
         x = self.stage2(x)
@@ -66,5 +65,4 @@ class CAM(Net):
         x = F.relu(x)
 
         x = x[0] + x[1].flip(-1)
-
         return x

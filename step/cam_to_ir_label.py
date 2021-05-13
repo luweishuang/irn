@@ -1,4 +1,3 @@
-
 import os
 import numpy as np
 import imageio
@@ -11,7 +10,6 @@ from misc import torchutils, imutils
 
 
 def _work(process_id, infer_dataset, args):
-
     databin = infer_dataset[process_id]
     infer_data_loader = DataLoader(databin, shuffle=False, num_workers=0, pin_memory=False)
 
@@ -42,9 +40,9 @@ def _work(process_id, infer_dataset, args):
         imageio.imwrite(os.path.join(args.ir_label_out_dir, img_name + '.png'),
                         conf.astype(np.uint8))
 
-
         if process_id == args.num_workers - 1 and iter % (len(databin) // 20) == 0:
             print("%d " % ((5 * iter + 1) // (len(databin) // 20)), end='')
+
 
 def run(args):
     dataset = voc12.dataloader.VOC12ImageDataset(args.train_list, voc12_root=args.voc12_root, img_normal=None, to_torch=False)
